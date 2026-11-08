@@ -21,7 +21,7 @@ async function deploy() {
   const V3Factory = await ethers.getContractFactory("MockV3Factory");
   const v3factory = await V3Factory.deploy();
 
-  const DCA = await ethers.getContractFactory("BotDCA");
+  const DCA = await ethers.getContractFactory("Accrue");
   const dca = await DCA.deploy(
     await router.getAddress(),
     await v3router.getAddress(),
@@ -44,7 +44,7 @@ async function increaseTime(seconds: number) {
   await ethers.provider.send("evm_mine", []);
 }
 
-describe("BotDCA", function () {
+describe("Accrue", function () {
   it("executes ERC20 -> ERC20 DCA and accrues tokenOut (V2 venue)", async () => {
     const { alice, usdt, weth, dca } = await deploy();
     const amount = ethers.parseEther("100");
@@ -86,7 +86,7 @@ describe("BotDCA", function () {
     expect(await usdt.balanceOf(alice.address)).to.equal(amount);
   });
 
-  it("executes USDT -> native BOT DCA", async () => {
+  it("executes USDT -> native Accrue", async () => {
     const { alice, usdt, dca, router } = await deploy();
     const amount = ethers.parseEther("100");
     const total = ethers.parseEther("1000");

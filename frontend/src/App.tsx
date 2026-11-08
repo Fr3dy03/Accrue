@@ -10,8 +10,8 @@ import {
   useWriteContract,
 } from "wagmi";
 import { formatUnits, parseEther, parseUnits, maxUint256 } from "viem";
-import { BOT_DCA, DCA_ADDRESS_IS_FALLBACK, NATIVE, USDT, WBOT, ROUTER, V3_FACTORY } from "./lib/constants";
-import { BOT_DCA_ABI, ERC20_ABI, ROUTER_ABI, V3_ABI } from "./lib/abi";
+import { ACCRUE, ACCRUE_ADDRESS_IS_FALLBACK, NATIVE, USDT, WBOT, ROUTER, V3_FACTORY } from "./lib/constants";
+import { ACCRUE_ABI, ERC20_ABI, ROUTER_ABI, V3_ABI } from "./lib/abi";
 import logo from "./logo.svg";
 import botchainLogo from "./botchain-logo.png";
 
@@ -193,15 +193,15 @@ export default function App() {
     setLoading(true);
     try {
       const nextId = (await publicClient.readContract({
-        address: BOT_DCA,
-        abi: BOT_DCA_ABI,
+        address: ACCRUE,
+        abi: ACCRUE_ABI,
         functionName: "nextId",
       })) as bigint;
       const list: Position[] = [];
       for (let i = 0; i < Number(nextId); i++) {
         const raw = (await publicClient.readContract({
-          address: BOT_DCA,
-          abi: BOT_DCA_ABI,
+          address: ACCRUE,
+          abi: ACCRUE_ABI,
           functionName: "positions",
           args: [BigInt(i)],
         })) as readonly [
@@ -212,8 +212,8 @@ export default function App() {
           const exs =
             raw[6] > 0n
               ? ((await publicClient.readContract({
-                  address: BOT_DCA,
-                  abi: BOT_DCA_ABI,
+                  address: ACCRUE,
+                  abi: ACCRUE_ABI,
                   functionName: "getExecutions",
                   args: [BigInt(i)],
                 })) as readonly { timestamp: bigint; amountIn: bigint; amountOut: bigint }[])
@@ -344,10 +344,10 @@ export default function App() {
     // Pre-flight: confirm a contract is actually deployed at the configured address,
     // otherwise the write targets an empty address and reverts for an opaque reason.
     try {
-      const code = await publicClient?.getCode({ address: BOT_DCA });
+      const code = await publicClient?.getCode({ address: ACCRUE });
       if (!code || code === "0x") {
         pushToast(
-          `No DCA contract at ${BOT_DCA.slice(0, 10)}… on chain ${chain?.id ?? "?"} — check VITE_DCA_ADDRESS.`,
+          `No strategy contract at ${ACCRUE.slice(0, 10)}… on chain ${chain?.id ?? "?"} — check VITE_ACCRUE_ADDRESS.`,
           "error"
         );
         return;
@@ -364,13 +364,13 @@ export default function App() {
     run(
       () =>
         writeContractAsync({
-          address: BOT_DCA,
-          abi: BOT_DCA_ABI,
+          address: ACCRUE,
+          abi: ACCRUE_ABI,
           functionName: "createPosition",
           args: [tokenIn, tokenOut, amt, BigInt(freq), n, BigInt(slippageBps)],
           value: tokenIn === NATIVE ? amt * n : 0n,
         }),
-      "DCA position created"
+      "Accrual strategy created"
     );
   }
 
@@ -381,7 +381,7 @@ export default function App() {
           address: USDT,
           abi: ERC20_ABI,
           functionName: "approve",
-          args: [BOT_DCA, maxUint256],
+          args: [ACCRUE, maxUint256],
         }),
       "USDT approved"
     );
@@ -389,14 +389,14 @@ export default function App() {
 
   function withdraw(id: number) {
     run(
-      () => writeContractAsync({ address: BOT_DCA, abi: BOT_DCA_ABI, functionName: "withdraw", args: [BigInt(id)] }),
+      () => writeContractAsync({ address: ACCRUE, abi: ACCRUE_ABI, functionName: "withdraw", args: [BigInt(id)] }),
       "Withdrawal confirmed"
     );
   }
 
   function cancel(id: number) {
     run(
-      () => writeContractAsync({ address: BOT_DCA, abi: BOT_DCA_ABI, functionName: "cancel", args: [BigInt(id)] }),
+      () => writeContractAsync({ address: ACCRUE, abi: ACCRUE_ABI, functionName: "cancel", args: [BigInt(id)] }),
       "Position cancelled"
     );
   }
@@ -406,8 +406,8 @@ export default function App() {
       <header className="header">
         <div className="header-inner container">
           <div className="brand">
-            <img src={logo} className="brand-mark" alt="BOT DCA logo" />
-            <span>BOT <span className="grad-text">DCA</span></span>
+            <img src={logo} className="brand-mark" alt="Accrue logo" />
+            <span className="brand-name">Accrue</span>
           </div>
           <div className="header-right">
             <button
@@ -419,7 +419,7 @@ export default function App() {
               {theme === "dark" ? "☀️" : "🌙"}
             </button>
             <span className={`net-badge ${chain?.id === 677 ? "ok" : "warn"}`}>
-              {chain?.id === 677 ? "BOT Chain Mainnet" : isConnected ? "Wrong network" : "Not connected"}
+              {chain?.id === 677 ? "BOT Chain · Mainnet" : isConnected ? "Wrong network" : "Wallet offline"}
             </span>
             {!isConnected ? (
               <button className="btn btn-primary" onClick={() => connect({ connector: connectors[0] })}>
@@ -449,10 +449,10 @@ export default function App() {
 
         <section className="hero">
           <h1>
-            Dollar-cost averaging, <span className="grad-text">on autopilot</span>
+            Build wealth with a <span className="grad-text">steady rhythm.</span>
           </h1>
           <p className="subtitle">
-            Automate recurring buys on BOT Chain — 0.75s blocks, ~$0.06 gas, fully verifiable on-chain.
+            Accrue makes recurring swaps simple, transparent, and fully verifiable on BOT Chain.
           </p>
           <div className="stats">
             <div className="stat">
@@ -474,7 +474,8 @@ export default function App() {
 
         <div className="layout">
           <section className="card">
-            <h2 className="card-title">Create a DCA</h2>
+            <div className="eyebrow">New strategy</div>
+            <h2 className="card-title">Create an Accrual</h2>
 
             <div className="segmented">
               <button className={direction === "in" ? "active" : ""} onClick={() => setDirection("in")}>
@@ -486,8 +487,8 @@ export default function App() {
             </div>
             <p className="dir-hint">
               {direction === "in"
-                ? "Spend BOT periodically to build up USDT."
-                : "Spend USDT periodically to build up BOT."}
+                ? "Convert BOT into USDT on a recurring schedule."
+                : "Convert USDT into BOT on a recurring schedule."}
             </p>
 
             <label className="field">
@@ -545,7 +546,7 @@ export default function App() {
               </div>
             </label>
 
-            <p className="keeper-note">Keeper fee 0.1% · permissionless execution</p>
+            <p className="keeper-note">0.1% executor fee · permissionless automation</p>
 
             <div className="summary">
               <span>Total deposit</span>
@@ -571,10 +572,10 @@ export default function App() {
             {direction === "out" ? (
               <div className="actions">
                 <button className="btn btn-ghost" onClick={approve}>Approve USDT</button>
-                <button className="btn btn-primary" style={{ flex: 1 }} disabled={!canCreate} onClick={create}>Create DCA</button>
+                <button className="btn btn-primary" style={{ flex: 1 }} disabled={!canCreate} onClick={create}>Start accrual</button>
               </div>
             ) : (
-              <button className="btn btn-primary btn-block" disabled={!canCreate} onClick={create}>Create DCA</button>
+              <button className="btn btn-primary btn-block" disabled={!canCreate} onClick={create}>Start accrual</button>
             )}
           </section>
 
@@ -595,7 +596,7 @@ export default function App() {
                 ))}
               </div>
             ) : positions.length === 0 ? (
-              <div className="empty">No positions yet. Create your first DCA to get started.</div>
+              <div className="empty">No accruals yet. Start your first strategy to get moving.</div>
             ) : (
               positions.map((p, i) => {
                 const pct = p.numIntervals > 0n ? Number((p.intervalsExecuted * 100n) / p.numIntervals) : 0;
@@ -690,7 +691,7 @@ export default function App() {
         <div className="container footer-inner">
           <div className="footer-brand">
             <img src={logo} className="brand-mark" alt="" />
-            <span>BOT DCA</span>
+            <span>Accrue</span>
           </div>
           <div className="footer-links">
             <a href="https://dev-docs.botchain.ai" target="_blank" rel="noreferrer">Docs</a>
@@ -698,20 +699,20 @@ export default function App() {
             <a href="https://www.botchain.ai" target="_blank" rel="noreferrer">BOT Chain</a>
           </div>
           <div className="footer-note" style={{ flexBasis: "100%", justifyContent: "center" }}>
-            <span>DCA contract</span>
+            <span>Strategy contract</span>
             <a
-              href={`https://scan.botchain.ai/address/${BOT_DCA}`}
+              href={`https://scan.botchain.ai/address/${ACCRUE}`}
               target="_blank"
               rel="noreferrer"
-              title={DCA_ADDRESS_IS_FALLBACK ? "VITE_DCA_ADDRESS missing/invalid — using the built-in mainnet address" : BOT_DCA}
+              title={ACCRUE_ADDRESS_IS_FALLBACK ? "VITE_ACCRUE_ADDRESS missing/invalid — using the built-in testnet address" : ACCRUE}
             >
-              {shortAddr(BOT_DCA)}
+              {shortAddr(ACCRUE)}
             </a>
-            {DCA_ADDRESS_IS_FALLBACK && <span className="net-badge warn">default</span>}
+            {ACCRUE_ADDRESS_IS_FALLBACK && <span className="net-badge warn">default</span>}
           </div>
           <div className="footer-note">
-            <span>Built on</span>
-            <a href="https://www.botchain.ai" target="_blank" rel="noreferrer" className="footer-powered">
+            <span className="footer-built-label">Powered by</span>
+            <a href="https://www.botchain.ai" target="_blank" rel="noreferrer" className="footer-powered" aria-label="BOT Chain">
               <img src={botchainLogo} alt="BOT Chain" />
             </a>
           </div>

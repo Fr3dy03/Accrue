@@ -1,6 +1,6 @@
-﻿import { ethers } from "hardhat";
+import { ethers } from "hardhat";
 
-const DCA = process.env.DCA_ADDRESS ?? "0x6eB819d09EfAF3Eb3ce52C4D6db3da6B2Fa37895";
+const DCA = process.env.ACCRUE_ADDRESS ?? "0x6eB819d09EfAF3Eb3ce52C4D6db3da6B2Fa37895";
 const ABI = [
   "function minInterval() view returns (uint256)",
   "function keeperFeeBps() view returns (uint256)",

@@ -8,11 +8,11 @@ import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol
 import {IUniswapV2Router02} from "./interfaces/IUniswapV2Router02.sol";
 import {IUniswapV3SwapRouter, IV3Factory, IV3Pool, IWETH9} from "./interfaces/IUniswapV3.sol";
 
-/// @title BotDCA
+/// @title Accrue
 /// @notice Permissionless dollar-cost averaging on BOT Chain.
 ///         A user deposits a budget of `tokenIn`; anyone can call `execute` to swap
 ///         `amountPerInterval` into `tokenOut` at each interval until the budget ends.
-contract BotDCA is Ownable, ReentrancyGuard {
+contract Accrue is Ownable, ReentrancyGuard {
     using SafeERC20 for IERC20;
 
     /// @dev Sentinel for native BOT (same convention as 1inch/Paraswap).

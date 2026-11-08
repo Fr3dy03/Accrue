@@ -1,4 +1,4 @@
-# install-keeper-task.ps1 — register the BOT DCA keeper as a durable Windows task.
+# install-keeper-task.ps1 — register the Accrue keeper as a durable Windows task.
 #
 # Creates (or replaces) a per-user Scheduled Task that runs the supervisor
 # (run-keeper.ps1) at logon, keeps it alive, and never stops on battery.
@@ -6,10 +6,10 @@
 # the keeper survives reboots, logoffs, and crashes.
 #
 # Run:  powershell -NoProfile -ExecutionPolicy Bypass -File install-keeper-task.ps1
-# Remove: Unregister-ScheduledTask -TaskName 'BotDCA-Keeper' -Confirm:$false
+# Remove: Unregister-ScheduledTask -TaskName 'Accrue-Keeper' -Confirm:$false
 
 $ErrorActionPreference = "Stop"
-$TaskName = "BotDCA-Keeper"
+$TaskName = "Accrue-Keeper"
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 $script = Join-Path $here "run-keeper.ps1"
 
@@ -48,7 +48,7 @@ Register-ScheduledTask `
   -Trigger @($logonTrigger, $repeatTrigger) `
   -Settings $settings `
   -Principal $principal `
-  -Description "BOT DCA keeper supervisor (BOT Chain testnet). Restarts on crash, boot and logon." `
+  -Description "Accrue keeper supervisor (BOT Chain testnet). Restarts on crash, boot and logon." `
   -Force | Out-Null
 
 Write-Host "Registered scheduled task '$TaskName'."

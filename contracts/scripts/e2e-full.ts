@@ -1,4 +1,4 @@
-// e2e-full.ts — prove the full BOT DCA loop works without manual intervention.
+// e2e-full.ts — prove the full Accrue loop works without manual intervention.
 //
 // Creates a position, then WAITS FOR THE KEEPER to execute every interval.
 // This script never calls execute() itself; that is the point of the test.
@@ -6,7 +6,7 @@
 // Usage: hardhat run scripts/e2e-full.ts --network botchain-testnet
 import { ethers } from "hardhat";
 
-const DCA = process.env.DCA_ADDRESS ?? "0x6eB819d09EfAF3Eb3ce52C4D6db3da6B2Fa37895";
+const DCA = process.env.ACCRUE_ADDRESS ?? "0x6eB819d09EfAF3Eb3ce52C4D6db3da6B2Fa37895";
 const NATIVE = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 const USDT = "0x75edC9335175Fc0552D51D48439F229c10420fe3";
 const QUOTER = "0x034A705b36067cff99ABf5C662Be881cBd8d0176";
@@ -44,7 +44,7 @@ async function main() {
   const marketPerBot = Number(quote) / 1e6 / Number(ethers.formatEther(PER_INTERVAL));
 
   console.log("=".repeat(58));
-  console.log("BOT DCA end-to-end (keeper-driven)");
+  console.log("Accrue end-to-end (keeper-driven)");
   console.log("=".repeat(58));
   console.log(`wallet          : ${me.address}`);
   console.log(`BOT balance     : ${ethers.formatEther(await ethers.provider.getBalance(me.address))}`);

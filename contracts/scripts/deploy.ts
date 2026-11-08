@@ -26,13 +26,13 @@ async function main() {
   const v3Factory = V3_FACTORIES[chainId];
   if (!router || !v3Router || !v3Factory) throw new Error(`BDEX addresses not configured for chain ${chainId}`);
 
-  console.log(`Deploying BotDCA on chain ${chainId} (v2 ${router}, v3 ${v3Router}, v3Factory ${v3Factory})`);
+  console.log(`Deploying Accrue on chain ${chainId} (v2 ${router}, v3 ${v3Router}, v3Factory ${v3Factory})`);
 
-  const factory = await ethers.getContractFactory("BotDCA");
+  const factory = await ethers.getContractFactory("Accrue");
   const dca = await factory.deploy(router, v3Router, v3Factory);
   await dca.waitForDeployment();
 
-  console.log(`BotDCA deployed at: ${await dca.getAddress()}`);
+  console.log(`Accrue deployed at: ${await dca.getAddress()}`);
 }
 
 main().catch((err) => {

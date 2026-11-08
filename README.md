@@ -1,10 +1,10 @@
-﻿# bot-dca
+# accrue
 
-[![CI](https://github.com/FrancisSix/Bot-DCA/actions/workflows/ci.yml/badge.svg)](https://github.com/FrancisSix/Bot-DCA/actions/workflows/ci.yml)
+[![CI](https://github.com/FrancisSix/Accrue/actions/workflows/ci.yml/badge.svg)](https://github.com/FrancisSix/Accrue/actions/workflows/ci.yml)
 
 Permissionless dollar-cost averaging on BOT Chain (EVM L1, 0.75s blocks, ~$0.06 gas).
 
-A user escrows a `BOT`/`USDT` budget in `BotDCA.sol`. A permissionless keeper swaps
+A user escrows a `BOT`/`USDT` budget in `Accrue.sol`. A permissionless keeper swaps
 `amountPerInterval` of `tokenIn` every `intervalSeconds` until the budget is spent.
 Every swap is recorded on-chain and readable via `getExecutions(id)`.
 
@@ -21,7 +21,7 @@ Contract (testnet): [`0x6eB819d09EfAF3Eb3ce52C4D6db3da6B2Fa37895`](https://scan.
 
 ## Solution
 
-`BotDCA.sol` is a self-contained DCA primitive:
+`Accrue.sol` is a self-contained DCA primitive:
 
 - Budget escrowed at creation â€” no custody beyond the user's own deposit.
 - `execute(id)` is permissionless â€” anyone can run a due interval.
@@ -35,18 +35,18 @@ Contract (testnet): [`0x6eB819d09EfAF3Eb3ce52C4D6db3da6B2Fa37895`](https://scan.
 ## Architecture
 
 ```
-bot-dca/
+accrue/
 â”œâ”€â”€ contracts/          Solidity + Hardhat
-â”‚   â”œâ”€â”€ contracts/      BotDCA.sol, V2 router + V3 router/factory interfaces, mocks/
+â”‚   â”œâ”€â”€ contracts/      Accrue.sol, V2 router + V3 router/factory interfaces, mocks/
 â”‚   â”œâ”€â”€ scripts/        deploy.ts, init.ts, smoke.ts, e2e.ts, verify.ts
-â”‚   â””â”€â”€ test/           BotDCA.ts (10 tests)
+â”‚   â””â”€â”€ test/           Accrue.ts (10 tests)
 â”œâ”€â”€ keeper/             Node + viem bot, polls isDue
 â””â”€â”€ frontend/           Vite + React + wagmi dApp
 ```
 
-Frontend -> BotDCA.sol: createPosition / withdraw / cancel (write), positions / getExecutions (read)
-Keeper   -> BotDCA.sol: isDue (read), execute (write)
-BotDCA   -> BDEX V2 Router: swapExactTokensForTokens / swapExactETHForTokens / swapExactTokensForETH
+Frontend -> Accrue.sol: createPosition / withdraw / cancel (write), positions / getExecutions (read)
+Keeper   -> Accrue.sol: isDue (read), execute (write)
+Accrue   -> BDEX V2 Router: swapExactTokensForTokens / swapExactETHForTokens / swapExactTokensForETH
 
 ## Contract API
 
@@ -104,8 +104,8 @@ npm --prefix keeper install
 npm --prefix frontend install
 
 cp contracts/.env.example contracts/.env   # PRIVATE_KEY
-cp keeper/.env.example keeper/.env         # KEEPER_PRIVATE_KEY (+ DCA_ADDRESS)
-cp frontend/.env.example frontend/.env     # VITE_DCA_ADDRESS
+cp keeper/.env.example keeper/.env         # KEEPER_PRIVATE_KEY (+ ACCRUE_ADDRESS)
+cp frontend/.env.example frontend/.env     # VITE_ACCRUE_ADDRESS
 ```
 
 Tests (9 passing):
@@ -131,7 +131,7 @@ cd contracts && npx hardhat run scripts/deploy.ts --network botchain-testnet
 cd contracts && npx hardhat run scripts/deploy.ts --network botchain-mainnet
 ```
 
-Then point `keeper/.env` (`DCA_ADDRESS`) and `frontend/.env` (`VITE_DCA_ADDRESS`) at it. For mainnet, also set `CHAIN_ID=677`, `RPC_URL=https://rpc.botchain.ai`, and `VITE_RPC_URL=https://rpc.botchain.ai`.
+Then point `keeper/.env` (`ACCRUE_ADDRESS`) and `frontend/.env` (`VITE_ACCRUE_ADDRESS`) at it. For mainnet, also set `CHAIN_ID=677`, `RPC_URL=https://rpc.botchain.ai`, and `VITE_RPC_URL=https://rpc.botchain.ai`.
 
 Full lifecycle on live testnet (deploy/create/execute/withdraw):
 
@@ -181,7 +181,7 @@ npx vercel                # preview
 npx vercel --prod         # production
 ```
 
-Or import the repo in the Vercel dashboard: root directory `frontend`, framework preset Vite, output `dist`. The two `VITE_*` values (contract address, RPC URL â€” both public) come from `frontend/.env.example`; no secrets are required, and `contracts/.env` / `keeper/.env` are never in the frontend build. Point `VITE_DCA_ADDRESS` at whichever deployment the UI should read.
+Or import the repo in the Vercel dashboard: root directory `frontend`, framework preset Vite, output `dist`. The two `VITE_*` values (contract address, RPC URL â€” both public) come from `frontend/.env.example`; no secrets are required, and `contracts/.env` / `keeper/.env` are never in the frontend build. Point `VITE_ACCRUE_ADDRESS` at whichever deployment the UI should read.
 
 Deploying is safe to do without the keeper or deployer keys â€” the frontend only reads public chain state.
 

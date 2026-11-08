@@ -1,6 +1,6 @@
 import { parseAbi } from "viem";
 
-export const BOT_DCA_ABI = parseAbi([
+export const ACCRUE_ABI = parseAbi([
   "function createPosition(address tokenIn, address tokenOut, uint256 amountPerInterval, uint256 intervalSeconds, uint256 numIntervals, uint256 slippageBps) payable returns (uint256)",
   "function execute(uint256 id) returns (uint256)",
   "function executeWithPath(uint256 id, address[] path) returns (uint256)",

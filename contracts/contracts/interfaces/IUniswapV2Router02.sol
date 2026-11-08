@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-/// Minimal Uniswap V2-style router interface used by BotDCA.
+/// Minimal Uniswap V2-style router interface used by Accrue.
 interface IUniswapV2Router02 {
     function WETH() external pure returns (address);
 

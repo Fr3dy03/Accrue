@@ -24,10 +24,10 @@ const ADDRS: Record<number, { router: string; wbot: string; usdt: string }> = {
   },
 };
 
-// Optional: DCA contract to inspect. Falls back to the testnet deployment.
+// Optional: Accrue contract to inspect. Falls back to the fresh testnet deployment.
 const DCA =
-  process.env.DCA_ADDRESS ??
-  "0x6eB819d09EfAF3Eb3ce52C4D6db3da6B2Fa37895";
+  process.env.ACCRUE_ADDRESS ??
+  "0x9690DDD6230476D82A5EF9B1d361C562eFdd151e";
 
 const DCA_ABI = [
   "function nextId() view returns (uint256)",
@@ -68,11 +68,11 @@ async function main() {
   // Deployed DCA contract, if deployed on this chain.
   const code = await ethers.provider.getCode(DCA);
   if (code === "0x") {
-    console.log(`DCA ${DCA}: not deployed on chain ${chainId} — skipping.`);
+    console.log(`Accrue ${DCA}: not deployed on chain ${chainId} — skipping.`);
   } else {
     const dca = new ethers.Contract(DCA, DCA_ABI, ethers.provider);
     const nextId = (await dca.nextId()) as bigint;
-    console.log(`DCA ${DCA}: deployed. nextId=${nextId.toString()} minInterval=${(await dca.minInterval()).toString()}s keeperFeeBps=${(await dca.keeperFeeBps()).toString()}`);
+    console.log(`Accrue ${DCA}: deployed. nextId=${nextId.toString()} minInterval=${(await dca.minInterval()).toString()}s keeperFeeBps=${(await dca.keeperFeeBps()).toString()}`);
     if (nextId > 0n) {
       const p = await dca.positions(0);
       const exs = (await dca.getExecutions(0)) as readonly (readonly [bigint, bigint, bigint])[];

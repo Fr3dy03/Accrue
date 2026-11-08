@@ -1,10 +1,10 @@
 import { createPublicClient, createWalletClient, http } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { config } from "./config";
-import { BOT_DCA_ABI } from "./abi";
+import { ACCRUE_ABI } from "./abi";
 
 if (!config.dcaAddress) {
-  throw new Error("Set DCA_ADDRESS in keeper/.env (address of the deployed BotDCA contract)");
+  throw new Error("Set ACCRUE_ADDRESS in keeper/.env (address of the deployed Accrue contract)");
 }
 if (!config.keeperPrivateKey) {
   throw new Error("Set KEEPER_PRIVATE_KEY in keeper/.env");
@@ -23,7 +23,7 @@ let errors = 0;
 async function refreshIds() {
   const nextId = await publicClient.readContract({
     address: config.dcaAddress,
-    abi: BOT_DCA_ABI,
+    abi: ACCRUE_ABI,
     functionName: "nextId",
   });
   for (let i = 0; i < Number(nextId); i++) ids.add(i);
@@ -35,7 +35,7 @@ async function executeOne(id: number) {
   // Simulate first to catch reverts (e.g. transient slippage) cheaply.
   const { request } = await publicClient.simulateContract({
     address: config.dcaAddress,
-    abi: BOT_DCA_ABI,
+    abi: ACCRUE_ABI,
     functionName: "execute",
     args: [BigInt(id)],
     account,
@@ -51,7 +51,7 @@ async function sweep() {
     try {
       due = await publicClient.readContract({
         address: config.dcaAddress,
-        abi: BOT_DCA_ABI,
+        abi: ACCRUE_ABI,
         functionName: "isDue",
         args: [BigInt(id)],
       });

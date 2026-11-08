@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Bot-DCA — Permissionless Dollar-Cost Averaging on BOT Chain</title>
+<title>Accrue — Permissionless Dollar-Cost Averaging on BOT Chain</title>
 <style>
   @page { size: A4; margin: 0; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -56,17 +56,17 @@
       <tr><td>Contract (testnet)</td><td class="mono">0x6eB819d09EfAF3Eb3ce52C4D6db3da6B2Fa37895 <span class="muted">(verified on BOTScan)</span></td></tr>
       <tr><td>Chain</td><td>BOT Chain Testnet · chain ID 968 · 0.75s blocks · ~$0.06 gas</td></tr>
       <tr><td>Stack</td><td>Solidity ≥0.8.20 (Hardhat) · Node/viem keeper · React + wagmi dApp</td></tr>
-      <tr><td>Repositories</td><td class="mono">github.com/FrancisSix/Bot-DCA</td></tr>
+      <tr><td>Repositories</td><td class="mono">github.com/FrancisSix/Accrue</td></tr>
       <tr><td>Status</td><td>Deployed, verified, end-to-end tested with an autonomous keeper</td></tr>
     </table>
   </div>
-  <div class="foot"><span>Bot-DCA Whitepaper</span><span>botchain.ai</span></div>
+  <div class="foot"><span>Accrue Whitepaper</span><span>botchain.ai</span></div>
 </section>
 
 <!-- ============ 1. ABSTRACT + PROBLEM ============ -->
 <section class="page">
   <h2>1 · Abstract</h2>
-  <p>Bot-DCA turns dollar-cost averaging — buying a fixed amount of an asset on a fixed schedule — into a smart-contract primitive on BOT Chain. A user deposits a budget once into the <b>BotDCA</b> contract, specifying an amount per interval, an interval length, a number of intervals, and a slippage tolerance. An open, permissionless keeper network monitors due positions and executes the swaps through the chain's BDEX Uniswap V2/V3 venues, earning a small fee (0.1%) per fill. The contract holds the funds, enforces every constraint, and credits output tokens to the position. Nobody — not the team, not a keeper — can misappropriate deposits, censor execution, or alter terms after creation.</p>
+  <p>Accrue turns dollar-cost averaging — buying a fixed amount of an asset on a fixed schedule — into a smart-contract primitive on BOT Chain. A user deposits a budget once into the <b>Accrue</b> contract, specifying an amount per interval, an interval length, a number of intervals, and a slippage tolerance. An open, permissionless keeper network monitors due positions and executes the swaps through the chain's BDEX Uniswap V2/V3 venues, earning a small fee (0.1%) per fill. The contract holds the funds, enforces every constraint, and credits output tokens to the position. Nobody — not the team, not a keeper — can misappropriate deposits, censor execution, or alter terms after creation.</p>
 
   <h2>2 · Problem</h2>
   <p>Recurring-buy automation exists on centralized exchanges, but on-chain DCA faces three structural problems:</p>
@@ -76,8 +76,8 @@
     <div class="card"><b>3. Thin-liquidity pricing</b>On a young chain, AMM pools drift; naive DCA either overpays or reverts without on-chain price guards.</div>
     <div class="card"><b>4. Opaque execution</b>Users can't verify that scheduled buys executed at fair prices without reading raw events.</div>
   </div>
-  <p style="margin-top:8px">Bot-DCA addresses all four: funds are held by the contract itself; <i>anyone</i> can execute a due position (so automation has no single point of failure); minimum-output amounts are computed on-chain from live pool state; and every fill is recorded as an on-chain execution record with its exact input/output amounts.</p>
-  <div class="foot"><span>Bot-DCA Whitepaper</span><span>2 / 6</span></div>
+  <p style="margin-top:8px">Accrue addresses all four: funds are held by the contract itself; <i>anyone</i> can execute a due position (so automation has no single point of failure); minimum-output amounts are computed on-chain from live pool state; and every fill is recorded as an on-chain execution record with its exact input/output amounts.</p>
+  <div class="foot"><span>Accrue Whitepaper</span><span>2 / 6</span></div>
 </section>
 
 <!-- ============ 3. DESIGN ============ -->
@@ -106,19 +106,19 @@
     <li><code>withdraw(id)</code> — claim accumulated output tokens at any time;</li>
     <li><code>cancel(id)</code> — refund the unspent budget pro-rata (plus any accrued output) and close the position.</li>
   </ul>
-  <div class="foot"><span>Bot-DCA Whitepaper</span><span>3 / 6</span></div>
+  <div class="foot"><span>Accrue Whitepaper</span><span>3 / 6</span></div>
 </section>
 
 <!-- ============ 4. ARCHITECTURE ============ -->
 <section class="page">
   <h2>4 · System Architecture</h2>
   <div class="arch">
-    <div class="row"><span class="box">User (React + wagmi dApp)</span><span class="arrow">→ create / approve / withdraw / cancel</span><span class="box">BotDCA contract</span></div>
+    <div class="row"><span class="box">User (React + wagmi dApp)</span><span class="arrow">→ create / approve / withdraw / cancel</span><span class="box">Accrue contract</span></div>
     <div class="row"><span class="box">Keeper(s) · Node + viem</span><span class="arrow">→ poll isDue → simulate → execute → fee</span><span class="box">BDEX V2 / V3 routers</span></div>
     <div class="row"><span class="muted" style="font-size:9pt">Windows scheduled-task supervisor ships in-repo: auto-start at logon, 10-min cadence check, mutex-guarded so only one supervisor instance runs.</span></div>
   </div>
   <div class="grid2" style="margin-top:12px">
-    <div class="card"><b>Contracts (Solidity / Hardhat)</b>BotDCA core with OpenZeppelin ReentrancyGuard + Ownable; interfaces for Uniswap V2 router and V3 SwapRouter/factory/pool. 10/10 tests passing against mocked venues.</div>
+    <div class="card"><b>Contracts (Solidity / Hardhat)</b>Accrue core with OpenZeppelin ReentrancyGuard + Ownable; interfaces for Uniswap V2 router and V3 SwapRouter/factory/pool. 10/10 tests passing against mocked venues.</div>
     <div class="card"><b>Keeper (Node + viem)</b>Polls <code>nextId</code>/<code>isDue</code>, simulates each execution before sending, retries with backoff, logs a heartbeat. Fully stateless — safe to run many in parallel.</div>
     <div class="card"><b>dApp (React + wagmi + Vite)</b>Create/manage positions, live V3-derived pricing, per-position execution history. Pre-flight checks: network guard, contract-presence check, decimal-correct amounts.</div>
     <div class="card"><b>Operations</b>One-command deploy + verification scripts; explorer-verified sources; read-only inspection tooling; E2E script that drives a real position to completion.</div>
@@ -132,7 +132,7 @@
     <li><b>Redundant keepers:</b> execution rights are open; the fee (0.1%) is the only incentive needed to sustain the network.</li>
     <li><b>Pause switch:</b> a global pause exists for incident response; it cannot move funds, only halt new activity.</li>
   </ul>
-  <div class="foot"><span>Bot-DCA Whitepaper</span><span>4 / 6</span></div>
+  <div class="foot"><span>Accrue Whitepaper</span><span>4 / 6</span></div>
 </section>
 
 <!-- ============ 5. TESTNET RESULTS ============ -->
@@ -163,7 +163,7 @@
     <li><b>Next:</b> mainnet (chain 677) deployment; keeper fee auctions; multi-hop V3 routes; top-up without recreating.</li>
     <li><b>Later:</b> additional output assets beyond USDT; strategy templates (buy-the-dip modifiers); indexer-backed analytics UI.</li>
   </ul>
-  <div class="foot"><span>Bot-DCA Whitepaper</span><span>5 / 6</span></div>
+  <div class="foot"><span>Accrue Whitepaper</span><span>5 / 6</span></div>
 </section>
 
 <!-- ============ 6. CLOSING ============ -->
@@ -177,15 +177,15 @@
   </ul>
 
   <h2 style="margin-top:18px">7 · Conclusion</h2>
-  <p>DCA is the most common investing habit in the world, and it deserves an on-chain form that is trust-minimized end to end: budget in the contract, terms immutable at creation, execution open to anyone, prices guarded on-chain, and every fill auditable forever. Bot-DCA demonstrates that this is practical today on BOT Chain — a verified contract, an open keeper that already runs unattended, and a dApp that makes the whole lifecycle visible. The protocol is live on testnet and ready for mainnet.</p>
+  <p>DCA is the most common investing habit in the world, and it deserves an on-chain form that is trust-minimized end to end: budget in the contract, terms immutable at creation, execution open to anyone, prices guarded on-chain, and every fill auditable forever. Accrue demonstrates that this is practical today on BOT Chain — a verified contract, an open keeper that already runs unattended, and a dApp that makes the whole lifecycle visible. The protocol is live on testnet and ready for mainnet.</p>
 
   <table class="kv" style="margin-top:16px">
-    <tr><td>Repo</td><td class="mono">github.com/FrancisSix/Bot-DCA</td></tr>
+    <tr><td>Repo</td><td class="mono">github.com/FrancisSix/Accrue</td></tr>
     <tr><td>Explorer</td><td class="mono">scan.bohr.life/address/0x6eB819d09EfAF3Eb3ce52C4D6db3da6B2Fa37895</td></tr>
     <tr><td>Contact</td><td>GitHub issues · FrancisSix</td></tr>
   </table>
   <p class="muted" style="margin-top:14px; font-size:9pt">This document describes software deployed to a public testnet for evaluation. Nothing here is financial advice; DCA strategies can lose value. Parameters quoted are live testnet values as of September 30, 2026.</p>
-  <div class="foot"><span>Bot-DCA Whitepaper</span><span>6 / 6</span></div>
+  <div class="foot"><span>Accrue Whitepaper</span><span>6 / 6</span></div>
 </section>
 
 </body>

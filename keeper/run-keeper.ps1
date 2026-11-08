@@ -1,4 +1,4 @@
-# run-keeper.ps1 — supervisor for the BOT DCA keeper.
+# run-keeper.ps1 — supervisor for the Accrue keeper.
 #
 # Runs `npm start` in a loop and restarts it if it exits for any reason
 # (crash, RPC drop, OOM). Intended to be launched by Windows Task Scheduler
@@ -18,7 +18,7 @@ function Write-Log($msg) {
 }
 
 # Prevent duplicate supervisors (Task Scheduler can fire more than once).
-$mutexName = "Global\BotDCAKeeperSupervisor"
+$mutexName = "Global\AccrueKeeperSupervisor"
 $createdNew = $false
 $mutex = New-Object System.Threading.Mutex($true, $mutexName, [ref]$createdNew)
 if (-not $createdNew) {

@@ -1,24 +1,24 @@
-// One-off: verify the deployed BotDCA source on BOTScan's Etherscan-compatible API.
+// One-off: verify the deployed Accrue source on BOTScan's Etherscan-compatible API.
 // Usage: hardhat run scripts/verify.ts --network botchain-testnet
 import { ethers } from "hardhat";
 import * as fs from "fs";
 import * as path from "path";
 
-const DCA = process.env.DCA_ADDRESS ?? "0x6eB819d09EfAF3Eb3ce52C4D6db3da6B2Fa37895";
+const DCA = process.env.ACCRUE_ADDRESS ?? "0x6eB819d09EfAF3Eb3ce52C4D6db3da6B2Fa37895";
 const API = "https://scan.bohr.life/api";
 const BUILD_INFO_DIR = path.join(__dirname, "..", "artifacts", "build-info");
 
 async function main() {
   const provider = ethers.provider;
 
-  // 1. Load the build-info that compiled BotDCA.sol.
+  // 1. Load the build-info that compiled Accrue.sol.
   const file = fs
     .readdirSync(BUILD_INFO_DIR)
     .find((f) => {
       const bi = JSON.parse(fs.readFileSync(path.join(BUILD_INFO_DIR, f), "utf8"));
-      return bi.input?.sources?.["contracts/BotDCA.sol"];
+      return bi.input?.sources?.["contracts/Accrue.sol"];
     });
-  if (!file) throw new Error("build-info for contracts/BotDCA.sol not found");
+  if (!file) throw new Error("build-info for contracts/Accrue.sol not found");
   const bi = JSON.parse(fs.readFileSync(path.join(BUILD_INFO_DIR, file), "utf8"));
   const input = bi.input;
   const solcVersion = `v${bi.solcLongVersion}`;
@@ -41,7 +41,7 @@ async function main() {
     onchainRuntime = onchainRuntime.split(a.toLowerCase().replace(/^0x/, "").padStart(64, "0")).join("0".repeat(64));
   }
   const localRuntime = (
-    bi.output?.contracts?.["contracts/BotDCA.sol"]?.BotDCA?.evm?.deployedBytecode?.object ?? ""
+    bi.output?.contracts?.["contracts/Accrue.sol"]?.Accrue?.evm?.deployedBytecode?.object ?? ""
   ).toLowerCase();
   if (onchainRuntime !== localRuntime) {
     console.log("RUNTIME MISMATCH — aborting (do not submit)");
@@ -66,7 +66,7 @@ async function main() {
     codeformat: "solidity-standard-json-input",
     sourceCode: JSON.stringify(input),
     contractaddress: DCA,
-    contractname: "contracts/BotDCA.sol:BotDCA",
+    contractname: "contracts/Accrue.sol:Accrue",
     compilerversion: solcVersion,
     optimizationUsed: settings.optimizer?.enabled ? "1" : "0",
     runs: String(runs),

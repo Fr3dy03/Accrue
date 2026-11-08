@@ -23,7 +23,7 @@ If Root Directory is left at the repo root, Vercel looks for `dist/` there — b
 ## Redeploy
 
 ```bash
-cd bot-dca/frontend
+cd accrue/frontend
 npx vercel --prod --force
 ```
 
@@ -40,10 +40,10 @@ If you *do* set them in the Vercel project, they must be valid:
 
 | Variable | Required value |
 |---|---|
-| `VITE_DCA_ADDRESS` | a real deployed address, e.g. `0x6eB819d09EfAF3Eb3ce52C4D6db3da6B2Fa37895` |
+| `VITE_ACCRUE_ADDRESS` | a real deployed address, e.g. `0x6eB819d09EfAF3Eb3ce52C4D6db3da6B2Fa37895` |
 | `VITE_RPC_URL` | `https://rpc.bohr.life` |
 
-> **Do not** leave `VITE_DCA_ADDRESS` empty or set it to the zero address.
+> **Do not** leave `VITE_ACCRUE_ADDRESS` empty or set it to the zero address.
 > Vite inlines `VITE_*` values at build time, so an empty/zero value would make
 > the app submit `createPosition` with no `to` target; the transaction is treated
 > as a contract creation and always reverts. The code now rejects an empty, zero,

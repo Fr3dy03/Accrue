@@ -1,6 +1,6 @@
-﻿import { ethers } from "hardhat";
+import { ethers } from "hardhat";
 
-const DCA = process.env.DCA_ADDRESS ?? "0x6eB819d09EfAF3Eb3ce52C4D6db3da6B2Fa37895";
+const DCA = process.env.ACCRUE_ADDRESS ?? "0x6eB819d09EfAF3Eb3ce52C4D6db3da6B2Fa37895";
 const NATIVE = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 const USDT = "0x75edC9335175Fc0552D51D48439F229c10420fe3";
 

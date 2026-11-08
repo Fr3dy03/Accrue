@@ -1,5 +1,5 @@
 {
-  "name": "bot-dca",
+  "name": "accrue",
   "version": "0.1.0",
   "private": true,
   "description": "Dollar-cost averaging on BOT Chain — smart contract + keeper + dApp",
